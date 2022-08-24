@@ -5,30 +5,25 @@ import matplotlib.image as mpimg
 import pandas as pd
 import cv2
 
-pic = Image.open('resources/lego1.jpg')
+
+pic = Image.open('resources/lego2.jpg')
 
 mm_to_pix = {
-    "0,32,9.6": [854,1641], "0,32,19.2": [854,1569], "0,64,9.6": [720,1582], "0,96,9.6": [594,1533], "0,64,28.8": [721,1443], "144,0,9.6": [1885,1539],
-    "0,0,9.6": [991,1696], "48,0,9.6": [1300,1645], "80,0,9.6": [1501,1610], "112,0,19.2": [1698,1503], "0,128,19.2": [471,1407], "112,0,38.4": [1700,1363], "0,128,38.4": [472,1270],
-    "0,160,9.6": [355,1425], "176,0,9.6": [2069,1506], "0,32,28.8": [856,1497], "0,32,38.4": [721,1371], "0,32,48.0": [721,1299], "0,32,57.6": [722,1227], "0,32,67.2": [722,1156],
-    "0,32,76.8": [723,1082], "80,0,57.6": [1505,1250], "80,0,67.2": [1508,1176], "80,0,48.0": [1505,1322], "144,0,48.0": [1892,1259], "0,160,48.0": [355,1157], "0,96,57.6": [594,1179],
-    '208,0,96':[2267, 856]
-    #, '176,0,96':[2085, 881]
-}
-
-corners = {
-    '0,0,124.8': [1000,800], '0,192,124.8':[248,580], '0,192,0':[244, 1448], '240,0,124.8':[2450,630], '240,0,0':[2424, 1510], '0,0,0':[992,1772]
+   '0,160,0':[407,1613], '0,128,19.2':[623,1503], '0,64,38.4':[1074,1431], '0,32,19.2':[1310,1635], '0,64,57.6':[1077,1271], '0,96,96':[850,912],
+   '0,128,96':[626,879],'0,32,9.6':[1310,1715],'0,16,48':[1434,1413],'0,32,96':[1320,980],'0,0,105.6':[1564,936],'0,0,115.2':[1566,850],'0,64,115.2':[1082,782],
+   '0,128,105.6':[625,799],'16,0,28.8':[1621,1566],'64,0,9.6':[1813,1625],'96,0,19.2':[1941,1486],'144,0,19.2':[2116,1398],'144,0,76.8':[2128,948],'16,0,105.6':[1633,913],
+   '208,0,105.6':[2352,641],'112,0,115.2':[2023,687],'48,0,115.2':[1772,776],'16,0,115.2':[1637,829],'240,0,9.6':[2430,1307],'240,0,115.2':[2456,531],'128,0,96':[2074,821],'192,0,96':[2296,737]
 }
 
 def img_draw():
-    image = cv2.imread('resources/lego1.jpg')
+    image = cv2.imread('resources/lego2.jpg')
     counter = 0
     times = 0
 
-    origin = (990, 1773)
-    x_ax = (1300, 1718)
-    z_ax = (993, 1403)
-    y_ax = (786, 1685)
+    origin = (1550, 1840)
+    x_ax = (1747, 1739)
+    z_ax = (1555, 1435)
+    y_ax = (1189, 1769)
     image = cv2.arrowedLine(image, origin, x_ax, (255,0,0), 9)
     image = cv2.putText(image, 'X', tuple(np.array(x_ax) - np.array([0, 20])), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,0,0), 2, cv2.LINE_AA, False)
     image = cv2.arrowedLine(image, origin, y_ax, (255,0,0), 9)
@@ -86,7 +81,6 @@ def img_draw():
 
     img = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     Image.fromarray(img).show()
-    
 
 def get_P_matrix():
     A = get_A_matrix()
@@ -100,8 +94,6 @@ def get_A_matrix(print_mode = False):
     z_s = []
     xprime = []
     yprime = []
-    mm_to_pix = corners
-
     # mm_to_pix = corners
     for key in mm_to_pix:
         key_data = key.split(",")
@@ -166,27 +158,16 @@ def decomposeP(P):
     c = -R.T.dot(np.linalg.inv(K).dot(P[:,3]))
     return K, R, c
 
+def vector_dist(vec1, vec2):
+    return np.linalg.norm(vec1 - vec2)
 
-def do_forward_map(world_coords):
-    A = get_A_matrix()
-    U, S, V = np.linalg.svd(A)
-    H = (V[-1]).reshape((3,4))
 
-    pixels = np.dot(H, np.array([world_coords[0], world_coords[1], world_coords[2], 1]))
-    pixels = (pixels / pixels[2])[:-1]
-    pixels = tuple(pixels.astype(int))
-    return pixels
     
-
-print(get_P_matrix())
-
-
 K, R, C = decomposeP(get_P_matrix())
 K = K / K[2][2]
-
-
 print(K)
 print()
 print(R)
 print()
 print(C)
+# print(vector_dist(np.array([-923.99874656, -514.65675181, 345.93903943]), np.array([-265.49751349, -577.78797156, 188.97851488])))
