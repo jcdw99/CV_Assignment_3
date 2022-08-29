@@ -168,17 +168,14 @@ def decomposeP(P):
 
 
 def do_forward_map(world_coords):
-    A = get_A_matrix()
-    U, S, V = np.linalg.svd(A)
-    H = (V[-1]).reshape((3,4))
+    P = get_P_matrix()
+    print(P)
 
-    pixels = np.dot(H, np.array([world_coords[0], world_coords[1], world_coords[2], 1]))
+    pixels = np.dot(P, np.array([world_coords[0], world_coords[1], world_coords[2], 1]))
     pixels = (pixels / pixels[2])[:-1]
     pixels = tuple(pixels.astype(int))
     return pixels
     
-
-print(get_P_matrix())
 
 
 K, R, C = decomposeP(get_P_matrix())
