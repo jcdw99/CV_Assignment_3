@@ -1,4 +1,4 @@
-# CV Assignment 3
+# Epipolar Geometry from Point Correspondences
 
 
 ## Question 1
